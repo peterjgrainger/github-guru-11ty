@@ -1,15 +1,15 @@
 {
-  "title": "Your Blog Name",
-  "url": "https://myurl.com/",
-  "description": "I am writing about my experiences as a naval navel-gazer.",
+  "title": "GitHub Guru",
+  "url": "https://eleventy-base-blog-puce.vercel.app/",
+  "description": "Become a Guru using GitHub's latest features",
   "feed": {
-    "subtitle": "I am writing about my experiences as a naval navel-gazer.",
+    "subtitle": "Become a Guru using GitHub's latest features",
     "filename": "feed.xml",
     "path": "/feed/feed.xml",
-    "id": "https://myurl.com/"
+    "id": "https://eleventy-base-blog-puce.vercel.app/"
   },
   "author": {
-    "name": "Your Name Here",
-    "email": "youremailaddress@example.com"
+    "name": "Peter Grainger",
+    "email": "peter@grainger.xyz"
   }
 }

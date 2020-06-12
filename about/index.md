@@ -7,4 +7,4 @@ eleventyNavigation:
   order: 3
 ---
 
-I am a person that writes stuff.
+Hi! I'm Peter. I spend my time trying to help others spend more time relaxing 🏖, and less time struggling with GitHub's--design decisions :)
