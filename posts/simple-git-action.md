@@ -53,11 +53,44 @@ jobs:
     - uses: actions/checkout@main
 ```
 
-## Setup Your Git Credentials
+## Transpile Your Code
 
-When you first use Git on a new computer there are a couple of settings that are required in the git config, your `name` and `email`. Your name and email are attached to the commit so you can look back through the history to see who broke the code.
+The next step is to transpile your code. I've hidden the complexity of the transpilation by using an npm script `npm run build`. Below is the workflow with the added call to run the build script. The call to `npm run build` is highlighted.
 
-The second bit of configuration is to authenticate. I normally do this through ssh but you can also configure git to use a token.
+```yml/8
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "run"
+  run:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@main
+    - run: npm run build
+```
 
-My first go at this was to run the Git commands directly.
+## Name and Email are Required Git Config Settings
+
+Before you can commit any changes, `name` and `email` are required git config settings that need to be set. On commit, your `name` and `email` settings are added as metadata. By attaching this information you can later look back through the history--and see who broke your code.
+
+The second bit of required configuration is authentication. On my laptop I would do this through ssh but another option is through a token.
+
+My first go at this was to run the Git commands directly in the workflow. This approach works and you may choose to do it this way yourself.
+
+```yml/9-15
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "run"
+  run:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@main
+    - run: npm run build
+    - run: |
+      git config --global user.email "peter@grainger.xyz"
+      git config --global user.name "Peter Grainger"
+      git commit -m "tested commiting via actions"
+      git remote set-url origin https://peterjgrainger:${{ secrets.GITHUB_TOKEN }}@github.com/peterjgrainger/test-push-github.git
+```
 
