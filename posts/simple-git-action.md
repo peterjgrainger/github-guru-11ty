@@ -71,11 +71,18 @@ jobs:
 
 ## Name and Email are Required Git Config Settings
 
-Before you can commit any changes, `name` and `email` are required git config settings that need to be set. On commit, your `name` and `email` settings are added as metadata. By attaching this information you can later look back through the history--and see who broke your code.
+Before you can commit any changes, `name` and `email` are required git config settings that need to be set. On commit, your `name` and `email` settings are added as metadata. By attaching this information you can later look back through the history--and see who broke your code. You can set these configuration parameters locally using the below on the command line
 
-The second bit of required configuration is authentication. On my laptop I would do this through ssh but another option is through a token.
+```bash
+git config --global user.email "peter@grainger.xyz"
+git config --global user.name "Peter Grainger"
+```
 
-My first go at this was to run the Git commands directly in the workflow. This approach works and you may choose to do it this way yourself.
+The second bit of required configuration is authentication. On my laptop I would do this through ssh but another option is through a token. GitHub actions uses a token with a short lifetime and is accessible using the special reference `${{ secrets.GITHUB_TOKEN }}`. Git has a special command to set up this token. `git remote set-url origin https://peterjgrainger:${{ secrets.GITHUB_TOKEN }}@github.com/peterjgrainger/test-push-github.git`
+
+## Run the Git Commands Directly in the Workflow
+
+My first go at this was to run the above Git commands directly in the workflow. This approach works and you may choose to do it this way yourself.
 
 ```yml/9-15
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
@@ -90,7 +97,49 @@ jobs:
     - run: |
       git config --global user.email "peter@grainger.xyz"
       git config --global user.name "Peter Grainger"
-      git commit -m "tested commiting via actions"
+      git commit -a -m "tested commiting via actions"
       git remote set-url origin https://peterjgrainger:${{ secrets.GITHUB_TOKEN }}@github.com/peterjgrainger/test-push-github.git
 ```
+
+## Time to Tidy Up.
+
+My son's favourite song at the minute is [Time to Tidy Up by Dave Moran](https://www.dailymotion.com/video/x6sg76r)--and that is exactly what we are going to do.
+
+My workflow file looks a bit messy and manual. Time to tidy it up. My first stop was to have a look at the [GitHub Marketplace](https://github.com/marketplace) to see if there were any actions to handle the configuration side. Luckily there the [Configure Git Credentials](https://github.com/marketplace/actions/configure-git-credentials) action, with a very simple setup shown below.
+
+```yml
+- uses: oleksiyrudenko/gha-git-credentials@v1
+      with:
+        token: '${{ secrets.GITHUB_TOKEN }}'
+```
+
+## The Complete Workflow File
+
+The following is the complete workflow. The steps are:
+- Check out the code that triggered the push
+- Configure Git with authorisation, name and email
+- Transpile the Typescript into Javascript
+- Stage and commit changes
+- Push changes to GitHub 
+
+```
+name: Push Transpiled Files
+on: push
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: oleksiyrudenko/gha-git-credentials@v1
+      with:
+        token: '${{ secrets.GITHUB_TOKEN }}'
+    - run: |
+      npm run build
+      git commit -a -m "Auto Transpile"
+      git push
+```
+
+## Workflow can be used for any Git Actions
+
+You can copy this workflow to automatically perform any action that updates the repository. Want to automatically format your code or fix linting errors? No problem. Change the `npm run build` line to whatever command you need to update your code. Be careful though, some changes might require manual input and some linters could cause bugs if problems are automatically fixed.
 
